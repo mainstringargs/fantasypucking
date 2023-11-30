@@ -34,7 +34,7 @@ def gen_pydfs(in_filename,out_filename):
     optimizer.set_max_repeating_players(2)
 
     # if you want to see lineups on screen
-    for lineup in optimizer.optimize(10):
+    for lineup in optimizer.optimize(5):
         print(lineup)
     optimizer.export(out_filename)
 
@@ -60,7 +60,7 @@ for contest in contests.contests:
     section = section_of_day(central.hour)
  #   if 'in-game' in contest.name.lower() and contest.entries_details.maximum > 500 and contest.entries_details.fee==.25 and weekday.lower() in sys.argv[1].strip().lower() and section.lower() in sys.argv[2].strip().lower():
 
-    if 'showdown' in contest.name.lower() and 'top 20' not in contest.name.lower() and 'satellite' not in contest.name.lower() and 'winner takes all' not in contest.name.lower() and contest.entries_details.maximum > 50 and contest.entries_details.fee>.1 and contest.entries_details.fee<5 and weekday.lower() in sys.argv[1].strip().lower() and section.lower() in sys.argv[2].strip().lower():
+    if 'showdown' in contest.name.lower() and 'top 10' not in contest.name.lower() and 'top 20' not in contest.name.lower() and 'satellite' not in contest.name.lower() and 'winner takes all' not in contest.name.lower() and contest.entries_details.maximum > 50 and contest.entries_details.fee>.1 and contest.entries_details.fee<5 and weekday.lower() in sys.argv[1].strip().lower() and section.lower() in sys.argv[2].strip().lower():
         print(central)
         print(contest)
         print(weekday,section)
@@ -103,7 +103,7 @@ for contest in contests.contests:
         combined_csv = combined_csv.fillna('pydfs')
         combined_csv = combined_csv.sort_values('FPPG',ascending=False)
         #export to csv
-        combined_csv.to_csv( "results/combined_results_"+teams+"_"+LOGDATE+"_"+now+"_"+str(contest.entries_details.maximum)+".csv", index=False, encoding='utf-8-sig',header=['CPT','FLEX','FLEX','FLEX','FLEX','FLEX','Budget','FPPG'])
+        combined_csv.to_csv( "results/nhl_combined_results_"+teams+"_"+LOGDATE+"_"+now+"_"+str(contest.entries_details.maximum)+".csv", index=False, encoding='utf-8-sig',header=['CPT','FLEX','FLEX','FLEX','FLEX','FLEX','Budget','FPPG'])
 
         #print(combined_csv)
 
