@@ -41,7 +41,7 @@ def gen_pydfs(in_filename, out_filename):
     optimizer.export(out_filename)
 
 
-# nhl_projections = sportsline_scraper.get_projections();
+#nhl_projections = sportsline_scraper.get_projections();
 nhl_projections = rotowire_scraper.get_projections();
 
 newpath = 'results'
