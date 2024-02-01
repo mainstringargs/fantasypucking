@@ -33,7 +33,7 @@ def gen_pydfs(in_filename, out_filename):
 
     optimizer.load_players_from_csv(in_filename)
 
-    optimizer.set_max_repeating_players(2)
+    #optimizer.set_max_repeating_players(1)
 
     # if you want to see lineups on screen
     for lineup in optimizer.optimize(5):
@@ -41,8 +41,8 @@ def gen_pydfs(in_filename, out_filename):
     optimizer.export(out_filename)
 
 
-#nhl_projections = sportsline_scraper.get_projections();
-nhl_projections = rotowire_scraper.get_projections();
+sportsline_nhl_projections = sportsline_scraper.get_projections();
+rotowire_nhl_projections = rotowire_scraper.get_projections();
 
 newpath = 'results'
 if not os.path.exists(newpath):
@@ -54,16 +54,15 @@ if not os.path.exists(newpath):
 
 now = datetime.now().strftime("%Y%m%d-%H%M%S")
 
-nhl_projections.to_csv(newpath + "/nhl_projections_" + now + ".csv");
 
-for contest in contests.contests:
+def gen_dfs(nhl_projections):
+    global newpath, now
     starting_time = contest.starts_at
     to_zone = tz.tzlocal()
     central = starting_time.astimezone(to_zone)
     weekday = central.strftime('%A')
     section = section_of_day(central.hour)
     #   if 'in-game' in contest.name.lower() and contest.entries_details.maximum > 500 and contest.entries_details.fee==.25 and weekday.lower() in sys.argv[1].strip().lower() and section.lower() in sys.argv[2].strip().lower():
-
     if 'showdown' in contest.name.lower() and 'top 10' not in contest.name.lower() and contest.entries_details.fee < 2 and 'top 20' not in contest.name.lower() and 'satellite' not in contest.name.lower() and 'winner takes all' not in contest.name.lower() and weekday.lower() in \
             sys.argv[1].strip().lower() and section.lower() in sys.argv[2].strip().lower():
         print(central)
@@ -102,21 +101,28 @@ for contest in contests.contests:
         if not os.path.exists(newpath):
             os.makedirs(newpath)
 
+        gen_pydfs(dk_df_merged_file, newpath + '/pydfs_result.csv')
+
+        extension = 'csv'
+        all_filenames = [i for i in glob.glob('temp/*.{}'.format(extension))]
+
+        combined_csv = pandas.concat([pandas.read_csv(f) for f in all_filenames])
+
+        now = datetime.now().strftime("%Y%m%d-%H%M%S")
+        combined_csv = combined_csv.fillna('pydfs')
+        combined_csv = combined_csv.sort_values('FPPG', ascending=False)
+        # export to csv
+        combined_csv.to_csv("results/nhl_combined_results_" + teams + "_" + LOGDATE + "_" + now + "_" + str(
+            contest.entries_details.maximum) + ".csv", index=False, encoding='utf-8-sig',
+                            header=['CPT', 'FLEX', 'FLEX', 'FLEX', 'FLEX', 'FLEX', 'Budget', 'FPPG'])
+
+
+for contest in contests.contests:
+    try:
+        gen_dfs(rotowire_nhl_projections)
+    except Exception:
+        print(traceback.format_exc())
         try:
-            gen_pydfs(dk_df_merged_file, newpath + '/pydfs_result.csv')
-
-            extension = 'csv'
-            all_filenames = [i for i in glob.glob('temp/*.{}'.format(extension))]
-
-            combined_csv = pandas.concat([pandas.read_csv(f) for f in all_filenames])
-
-            now = datetime.now().strftime("%Y%m%d-%H%M%S")
-            combined_csv = combined_csv.fillna('pydfs')
-            combined_csv = combined_csv.sort_values('FPPG', ascending=False)
-            # export to csv
-            combined_csv.to_csv("results/nhl_combined_results_" + teams + "_" + LOGDATE + "_" + now + "_" + str(
-                contest.entries_details.maximum) + ".csv", index=False, encoding='utf-8-sig',
-                                header=['CPT', 'FLEX', 'FLEX', 'FLEX', 'FLEX', 'FLEX', 'Budget', 'FPPG'])
+            gen_dfs(sportsline_nhl_projections)
         except Exception:
             print(traceback.format_exc())
-        # print(combined_csv)
