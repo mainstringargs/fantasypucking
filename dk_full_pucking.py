@@ -41,8 +41,8 @@ def gen_pydfs(in_filename, out_filename):
     optimizer.export(out_filename)
 
 
-sportsline_nhl_projections = sportsline_scraper.get_projections();
-rotowire_nhl_projections = rotowire_scraper.get_projections();
+sportsline_nhl_projections = None
+rotowire_nhl_projections = None
 
 newpath = 'results'
 if not os.path.exists(newpath):
@@ -72,6 +72,12 @@ def gen_dfs(nhl_projections):
             contest.draft_group_id)
 
         teams = contest.name[contest.name.find("(") + 1:contest.name.find(")")].replace(' ', '_')
+        
+        if nhl_projections is None:
+            sportsline_nhl_projections = sportsline_scraper.get_projections();
+            rotowire_nhl_projections = rotowire_scraper.get_projections();
+            nhl_projections = rotowire_nhl_projections;
+
 
         LOGDATE = central.strftime("%Y%m%d-%H%M%S")
 

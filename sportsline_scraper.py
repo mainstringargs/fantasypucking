@@ -7,6 +7,7 @@ from selenium.webdriver.support import expected_conditions as EC
 import pandas as pd
 import os
 import base64;
+from selenium.webdriver.chrome.options import Options
 
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
@@ -19,7 +20,11 @@ def scrape_and_save_data(base_url):
     player_list, team_list, stat_list, line_list, bet_list, win_percent_list = [], [], [], [], [], []
 
     # Set up the web driver (make sure to specify the path to your browser driver)
-    driver = webdriver.Chrome()
+    chrome_options = Options()
+    chrome_options.add_argument('--headless')
+
+    # Initialize Chrome WebDriver with options
+    driver = webdriver.Chrome(options=chrome_options)
 
     decoded_url = base64.b64decode(base_url).decode()
     print("Opening URL", decoded_url)
